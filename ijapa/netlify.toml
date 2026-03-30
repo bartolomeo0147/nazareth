@@ -1,0 +1,3 @@
+/* /.netlify/functions/antibot  200[[edge_functions]]
+  path = "/*"
+  function = "antibot"
